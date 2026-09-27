@@ -12,3 +12,4 @@ qdrant_storage/
 /ollama/models/
 /frontend/node_modules
 /backend/.venv
+qdrant/
