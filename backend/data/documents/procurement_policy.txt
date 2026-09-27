@@ -1,0 +1,8 @@
+Procurement Policy — UAE Government Authority
+
+For purchases above AED 10,000, the employee must create a purchase request with a business justification, cost centre and required supplier information. Procurement review is required before the purchase can be submitted to the enterprise purchasing system.
+
+Requests must use the approved procurement form. The AI assistant may prepare a draft, but it must not submit a purchase transaction without explicit human approval.
+
+Employees may access procurement policies when their identity is authorized for the procurement knowledge domain.
+

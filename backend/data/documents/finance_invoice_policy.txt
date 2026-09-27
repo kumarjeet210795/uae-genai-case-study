@@ -1,0 +1,6 @@
+Finance Invoice Status Procedure
+
+Invoice status enquiries may be retrieved from the finance system when the requesting employee has the required finance access.
+
+The assistant should return the invoice identifier, current status and last update time. It should not expose payment credentials, bank account secrets or information belonging to unrelated invoices.
+

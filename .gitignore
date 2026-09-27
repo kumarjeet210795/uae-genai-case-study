@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+.vite/
+node_modules/
+dist/
+.env
+*.log
+qdrant_storage/
+/opa
+/ollama/runtime/
+/ollama/models/
+/frontend/node_modules
+/backend/.venv

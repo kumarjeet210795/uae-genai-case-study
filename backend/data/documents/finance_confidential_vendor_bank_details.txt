@@ -1,0 +1,8 @@
+CONFIDENTIAL FINANCE DOCUMENT
+
+This document is intentionally restricted to the finance group for the demo.
+It contains sensitive vendor banking metadata. The assistant must not disclose
+this document to users outside finance, even if a user asks for it explicitly.
+
+Never expose bank account credentials or payment secrets.
+

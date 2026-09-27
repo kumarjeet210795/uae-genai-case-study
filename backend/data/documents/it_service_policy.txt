@@ -1,0 +1,6 @@
+IT Service Request Policy
+
+Employees can request standard IT services such as laptop support, VPN access, password reset and approved software. The assistant may create a draft service request.
+
+For actions that create or modify an IT ticket, the user must be authorized for the IT service and the operation must be logged with a request ID. The employee receives the ServiceNow case identifier after successful creation.
+

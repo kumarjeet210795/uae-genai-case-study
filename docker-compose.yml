@@ -1,0 +1,108 @@
+services:
+  frontend:
+    image: node:22-alpine
+    working_dir: /workspace
+    volumes:
+      - ./frontend:/workspace
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports: ["5173:5173"]
+    environment:
+      VITE_API_URL: http://localhost:8000
+    depends_on: [backend]
+
+  backend:
+    build: {context: ./backend}
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      OPA_URL: http://opa:8181
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: qwen2.5:3b
+      EMBEDDING_MODEL: intfloat/multilingual-e5-small
+      DATABASE_URL: postgresql://govai:govai@postgres:5432/govai
+      REDIS_URL: redis://redis:6379/0
+      MCP_SAP_URL: http://mcp-sap:8001/mcp
+      MCP_SERVICENOW_URL: http://mcp-servicenow:8002/mcp
+      MCP_D365_URL: http://mcp-d365:8003/mcp
+      MCP_REST_URL: http://mcp-rest:8004/mcp
+      DEMO_JWT_SECRET: change-me-demo-only
+    ports: ["8000:8000"]
+    volumes: ["./backend:/app"]
+    depends_on:
+      qdrant: {condition: service_started}
+      opa: {condition: service_started}
+      ollama: {condition: service_started}
+      postgres: {condition: service_healthy}
+      redis: {condition: service_started}
+      mcp-sap: {condition: service_started}
+      mcp-servicenow: {condition: service_started}
+      mcp-d365: {condition: service_started}
+      mcp-rest: {condition: service_started}
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.5
+    ports: ["6333:6333", "6334:6334"]
+    volumes: [qdrant_data:/qdrant/storage]
+
+  opa:
+    image: openpolicyagent/opa:1.8.0
+    command: ["run", "--server", "--addr=0.0.0.0:8181", "/policies"]
+    ports: ["8181:8181"]
+    volumes: ["./backend/policies:/policies:ro"]
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: govai
+      POSTGRES_USER: govai
+      POSTGRES_PASSWORD: govai
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U govai -d govai"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes: [postgres_data:/var/lib/postgresql/data]
+
+  redis:
+    image: redis:8-alpine
+    ports: ["6379:6379"]
+
+  ollama:
+    image: ollama/ollama:latest
+    ports: ["11434:11434"]
+    volumes: [ollama_data:/root/.ollama]
+
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on: [ollama]
+    environment: {OLLAMA_HOST: http://ollama:11434}
+    entrypoint: ["/bin/sh", "-c"]
+    command: "sleep 8 && ollama pull qwen2.5:3b"
+
+  mcp-sap:
+    build: {context: ./backend}
+    command: python -m app.mcp_servers.sap_server
+    environment: {MCP_PORT: 8001}
+    ports: ["8001:8001"]
+
+  mcp-servicenow:
+    build: {context: ./backend}
+    command: python -m app.mcp_servers.servicenow_server
+    environment: {MCP_PORT: 8002}
+    ports: ["8002:8002"]
+
+  mcp-d365:
+    build: {context: ./backend}
+    command: python -m app.mcp_servers.d365_server
+    environment: {MCP_PORT: 8003}
+    ports: ["8003:8003"]
+
+  mcp-rest:
+    build: {context: ./backend}
+    command: python -m app.mcp_servers.rest_server
+    environment: {MCP_PORT: 8004}
+    ports: ["8004:8004"]
+
+volumes:
+  qdrant_data:
+  ollama_data:
+  postgres_data:
